@@ -1,11 +1,15 @@
 """Behavior tests for FlowBuilder."""
 
+import logging
+
 import pytest
-from conftest import MakeStep
+from conftest import MakeStep, RecordingObserver
 
 from flowstep.builder import FlowBuilder
-from flowstep.core import Flow
+from flowstep.core import Flow, LoggingObserver, Step
 from flowstep.validation.exceptions import FlowValidationError
+
+_LOGGER_NAME = "flowstep.core.observability.logging_observer"
 
 
 def test_build_returns_flow_with_added_steps(make_step: MakeStep) -> None:
@@ -48,8 +52,85 @@ def test_build_with_validate_passes_when_contract_is_satisfied(make_step: MakeSt
 def test_build_with_validate_uses_initial_context_keys(make_step: MakeStep) -> None:
     step = make_step(name="step", required_keys={"input"})
 
-    flow = FlowBuilder("pipeline").add_step(step).build(
-        validate=True, initial_context={"input": "value"}
+    flow = (
+        FlowBuilder("pipeline")
+        .add_step(step)
+        .build(validate=True, initial_context={"input": "value"})
     )
 
     assert isinstance(flow, Flow)
+
+
+def test_add_observer_returns_self_for_chaining() -> None:
+    builder = FlowBuilder("pipeline")
+
+    result = builder.add_observer(RecordingObserver())
+
+    assert result is builder
+
+
+def test_build_flow_notifies_registered_observer_on_run(make_step: MakeStep) -> None:
+    observer = RecordingObserver()
+    step = make_step(name="step")
+
+    flow = FlowBuilder("pipeline").add_step(step).add_observer(observer).build()
+    flow.run()
+
+    assert [call[0] for call in observer.calls] == ["on_start", "on_end"]
+    assert observer.calls[0][1] == "step"
+
+
+def test_build_flow_uses_default_logging_observer_without_add_observer(
+    make_step: MakeStep, caplog: pytest.LogCaptureFixture
+) -> None:
+    step = make_step(name="step")
+    flow = FlowBuilder("pipeline").add_step(step).build()
+
+    with caplog.at_level(logging.INFO, logger=_LOGGER_NAME):
+        flow.run()
+
+    assert any("step" in record.getMessage() for record in caplog.records)
+
+
+def test_build_flow_notifies_both_default_logging_and_custom_observer(
+    make_step: MakeStep, caplog: pytest.LogCaptureFixture
+) -> None:
+    observer = RecordingObserver()
+    step = make_step(name="step")
+
+    flow = FlowBuilder("pipeline").add_step(step).add_observer(observer).build()
+
+    with caplog.at_level(logging.INFO, logger=_LOGGER_NAME):
+        flow.run()
+
+    assert any("step" in record.getMessage() for record in caplog.records)
+    assert [call[0] for call in observer.calls] == ["on_start", "on_end"]
+
+
+def test_build_flow_calls_default_logging_observer_before_custom_observer_on_start(
+    make_step: MakeStep, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    call_order: list[str] = []
+    original_on_start = LoggingObserver.on_start
+
+    def recording_on_start(self: LoggingObserver, step: Step) -> None:
+        call_order.append("logging")
+        original_on_start(self, step)
+
+    monkeypatch.setattr(LoggingObserver, "on_start", recording_on_start)
+
+    class OrderTrackingObserver:
+        def on_start(self, step: object) -> None:
+            call_order.append("custom")
+
+        def on_end(self, step: object, duration_ms: float) -> None:
+            pass
+
+        def on_error(self, step: object, error: Exception) -> None:
+            pass
+
+    step = make_step(name="step")
+    flow = FlowBuilder("pipeline").add_step(step).add_observer(OrderTrackingObserver()).build()
+    flow.run()
+
+    assert call_order == ["logging", "custom"]

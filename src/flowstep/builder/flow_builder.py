@@ -6,7 +6,10 @@ from typing import Any, Self
 
 from pydantic import BaseModel
 
-from ..core import Flow, FlowContext, Step
+from ..core import Flow, FlowContext, LoggingObserver, Step, StepObserver
+from ..core.observability.composite_observer import (
+    _CompositeObserver,  # pyright: ignore[reportPrivateUsage]
+)
 from ..validation import FlowValidator
 from ..validation.exceptions import FlowValidationError
 
@@ -35,6 +38,7 @@ class FlowBuilder:
         """
         self._name = pipeline_name
         self._steps: list[Step] = []
+        self._observers: list[StepObserver] = [LoggingObserver()]
 
     def add_step(self, step: Step) -> Self:
         """Add a step to the pipeline.
@@ -46,6 +50,18 @@ class FlowBuilder:
             Self to allow method chaining.
         """
         self._steps.append(step)
+        return self
+
+    def add_observer(self, observer: StepObserver) -> Self:
+        """Add a step lifecycle observer to the pipeline.
+
+        Args:
+            observer: Observer to add.
+
+        Returns:
+            Self to allow method chaining.
+        """
+        self._observers.append(observer)
         return self
 
     def build(
@@ -70,7 +86,7 @@ class FlowBuilder:
         Raises:
             FlowValidationError: If validate=True and any ERROR is found.
         """
-        flow = Flow(self._name, self._steps)
+        flow = Flow(self._name, self._steps, observer=_CompositeObserver(self._observers))
 
         if validate:
             report = FlowValidator().validate(

@@ -1,9 +1,11 @@
 """Pipeline orchestrator."""
 
+from time import perf_counter
 from typing import Any
 
 from ..context import FlowContext
 from ..exceptions import FlowExecutionError
+from ..observability import LoggingObserver, StepObserver
 from ..step import Step
 
 
@@ -22,15 +24,18 @@ class Flow:
         self,
         name: str,
         steps: list[Step],
+        observer: StepObserver | None = None,
     ) -> None:
         """Initialize the pipeline.
 
         Args:
             name: Name of the pipeline.
             steps: List of steps to execute sequentially.
+            observer: Step lifecycle observer. Defaults to `LoggingObserver()`.
         """
         self.name = name
         self._steps = list(steps)
+        self._observer: StepObserver = observer or LoggingObserver()
 
     @property
     def _context(self) -> FlowContext:
@@ -76,7 +81,12 @@ class Flow:
         return f"Flow(name='{self.name}', steps={len(self._steps)})"
 
     def __execute_step(self, step: Step) -> None:
+        self._observer.on_start(step)
+        start = perf_counter()
         try:
             step.execute(self._context)
         except Exception as e:
+            self._observer.on_error(step, e)
             raise FlowExecutionError(step.name, e) from e
+        else:
+            self._observer.on_end(step, (perf_counter() - start) * 1000)

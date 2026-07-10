@@ -1,7 +1,9 @@
 """Behavior tests for Flow execution."""
 
+import logging
+
 import pytest
-from conftest import MakeStep
+from conftest import MakeStep, RecordingObserver
 
 from flowstep.core import Flow, FlowContext
 from flowstep.core.exceptions import FlowExecutionError
@@ -65,3 +67,56 @@ def test_get_steps_returns_copy_not_internal_list(make_step: MakeStep) -> None:
     steps.append(make_step(name="extra"))
 
     assert flow.get_steps() == [step]
+
+
+def test_run_calls_observer_on_start_then_on_end_on_success(make_step: MakeStep) -> None:
+    observer = RecordingObserver()
+    step = make_step(name="step")
+
+    flow = Flow("pipeline", [step], observer=observer)
+    flow.run()
+
+    assert [call[0] for call in observer.calls] == ["on_start", "on_end"]
+    assert observer.calls[0][1] == "step"
+    duration_ms = observer.calls[1][2]
+    assert duration_ms >= 0
+
+
+def test_run_calls_observer_on_start_then_on_error_on_failure(make_step: MakeStep) -> None:
+    def failing_execute(_: FlowContext) -> None:
+        raise ValueError("boom")
+
+    observer = RecordingObserver()
+    step = make_step(name="risky", on_execute=failing_execute)
+    flow = Flow("pipeline", [step], observer=observer)
+
+    with pytest.raises(FlowExecutionError) as exc_info:
+        flow.run()
+
+    assert [call[0] for call in observer.calls] == ["on_start", "on_error"]
+    assert exc_info.value.step_name == "risky"
+    assert isinstance(exc_info.value.original_error, ValueError)
+
+
+def test_run_calls_observer_hooks_in_step_order_for_multiple_steps(make_step: MakeStep) -> None:
+    observer = RecordingObserver()
+    step_a = make_step(name="a")
+    step_b = make_step(name="b")
+
+    flow = Flow("pipeline", [step_a, step_b], observer=observer)
+    flow.run()
+
+    step_names_in_call_order = [call[1] for call in observer.calls]
+    assert step_names_in_call_order == ["a", "a", "b", "b"]
+
+
+def test_run_uses_default_logging_observer_when_none_provided(
+    make_step: MakeStep, caplog: pytest.LogCaptureFixture
+) -> None:
+    step = make_step(name="step")
+    flow = Flow("pipeline", [step])
+
+    with caplog.at_level(logging.INFO, logger="flowstep.core.observability.logging_observer"):
+        flow.run()
+
+    assert any("step" in record.getMessage() for record in caplog.records)

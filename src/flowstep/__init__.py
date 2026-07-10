@@ -12,7 +12,7 @@ Example:
 """
 
 from .builder import FlowBuilder
-from .core import Flow, FlowContext, Step
+from .core import Flow, FlowContext, LoggingObserver, Step, StepObserver
 from .core.exceptions import FlowExecutionError
 from .validation import (
     FlowValidationError,
@@ -28,6 +28,8 @@ __all__ = [
     "Flow",
     "FlowContext",
     "FlowExecutionError",
+    "StepObserver",
+    "LoggingObserver",
     "ValidationSeverity",
     "StepValidationResult",
     "FlowValidationReport",
