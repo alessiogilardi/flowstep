@@ -36,6 +36,40 @@ so this works without `tests/__init__.py` files).
   `cast(set[object], raw_keys)` is used after the `isinstance(raw_keys, set)` guard to give
   pyright a typed iterable.
 
+## Versioning
+
+flowstep uses SemVer (`major.minor.bugfix`), tracked in `pyproject.toml` via
+`uv version --bump {major,minor,patch}` (no dynamic/VCS-derived versioning, no
+commitizen/semantic-release — there's no CI yet to run that automation against). Baseline is
+tagged `v0.1.0`.
+
+Version bumps happen **per qualifying commit**, not at separate release time, driven by the
+commit's gitmoji (see the global `commit` skill for the full legend):
+
+| Gitmoji | Meaning | Bump | CHANGELOG category |
+|---|---|---|---|
+| ✨ | New feature | minor | Added |
+| 🐛 / 🩹 / 🚑️ | Bug fix / simple fix / hotfix | patch | Fixed |
+| 🔒️ | Security fix | patch | Security |
+| everything else (♻️ 📝 ✅ 🔧 📦 💄 ⚡️ 🔥 🚚 🏗️ 🎉 ⏪️ 💡 🏷️ 🌱) | internal/non-behavioral | none | — |
+
+- **Pre-1.0 caveat**: while the version is `0.x.y`, SemVer permits breaking changes within minor
+  bumps. A major bump (or the `1.0.0` transition) is never inferred automatically from a
+  gitmoji — only when the user explicitly asks for it, since the gitmoji legend has no
+  dedicated "breaking change" marker.
+- **Edge cases** (🔥 removing public API, ⚡️ changing observable behavior): flag for manual
+  judgment rather than auto-bumping — not reliably classifiable from the emoji alone.
+- **Process**: before staging a commit in this repo, check whether its gitmoji triggers a bump.
+  - If yes: run `uv version --bump <level>` (updates `pyproject.toml` + `uv.lock`), prepend a
+    `## [X.Y.Z] - <date>` entry to `CHANGELOG.md` under the matching category with the commit
+    subject (minus emoji, verbatim — CHANGELOG entries are mechanically derived, never
+    freehand-summarized) as the bullet, then stage `pyproject.toml`, `uv.lock`, and
+    `CHANGELOG.md` alongside the code change in the **same** commit — it's metadata about the
+    same logical change, not a separate one.
+  - If no: commit as usual, no version/changelog changes.
+- **Tags mark releases, not commits**: `vX.Y.Z` tags (and pushing them) are only created when
+  the user explicitly asks for a release — never automatically per commit.
+
 ## Architecture
 
 FlowStep is a sequential pipeline (ETL-style) execution framework built around four core
