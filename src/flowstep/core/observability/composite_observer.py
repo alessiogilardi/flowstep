@@ -1,8 +1,7 @@
-
 """Private composite observer that fans out lifecycle events to multiple observers."""
 
 from ..step import Step
-from .step_observer import StepObserver
+from .protocols import StepObserver
 
 
 class _CompositeObserver:  # pyright: ignore[reportUnusedClass]

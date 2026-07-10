@@ -2,7 +2,7 @@
 
 from typing import Protocol, runtime_checkable
 
-from ..step import Step
+from ...step import Step
 
 
 @runtime_checkable

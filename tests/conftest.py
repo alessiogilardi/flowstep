@@ -85,6 +85,21 @@ class RecordingObserver:
         self.calls.append(("on_error", step.name, error))
 
 
+class RecordingDataVolumeObserver:
+    """Observer double that records `on_processed` calls as a list of tuples.
+
+    Each entry is `(step_name, input_size, output_size)`. Structurally satisfies the
+    `DataVolumeObserver` protocol contract without importing it, so this double works
+    independently of the observability subpackage.
+    """
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, int | None, int | None]] = []
+
+    def on_processed(self, step: Step, input_size: int | None, output_size: int | None) -> None:
+        self.calls.append((step.name, input_size, output_size))
+
+
 @pytest.fixture
 def flow_context() -> FlowContext:
     return FlowContext()
