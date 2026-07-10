@@ -29,6 +29,9 @@ class Step(ABC):
     def name(self) -> str:
         return self._name
 
+    def __call__(self, context: FlowContext) -> None:
+        self.execute(context)
+
     @abstractmethod
     def execute(self, context: FlowContext) -> None:
         """Execute the step logic.

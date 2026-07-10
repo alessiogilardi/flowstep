@@ -84,7 +84,7 @@ class Flow:
         self._observer.on_start(step)
         start = perf_counter()
         try:
-            step.execute(self._context)
+            step(self._context)
         except Exception as e:
             self._observer.on_error(step, e)
             raise FlowExecutionError(step.name, e) from e
