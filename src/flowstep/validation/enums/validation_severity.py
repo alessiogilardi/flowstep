@@ -1,14 +1,14 @@
-"""Enumerazioni per il sistema di validazione."""
+"""Enumerations for the validation system."""
 
 from enum import StrEnum
 
 
 class ValidationSeverity(StrEnum):
-    """Livello di gravità di un risultato di validazione.
+    """Severity level of a validation result.
 
     Attributes:
-        ERROR: Errore bloccante che impedisce l'esecuzione della pipeline
-        WARNING: Avviso non bloccante
+        ERROR: Blocking error that prevents pipeline execution
+        WARNING: Non-blocking warning
     """
 
     ERROR = "error"

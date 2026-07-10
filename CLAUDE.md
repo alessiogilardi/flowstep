@@ -127,8 +127,8 @@ re-exports the full public API (`FlowBuilder`, `Step`, `Flow`, `FlowContext`,
 `FlowExecutionError`, validation types). When adding new public types, update both the
 subpackage's `__init__.py` and, if it's part of the top-level public API, `flowstep/__init__.py`.
 
-### Mixed-language docstrings
+### Documentation language
 
-Some files use Italian docstrings (e.g. `validation/models/step_validation_result.py`,
-`validation/enums/validation_severity.py`) while most of the codebase is in English. Match the
-existing language of the file you're editing rather than normalizing it unprompted.
+All documentation, docstrings, comments, and any other generated text added to this
+project must be written exclusively in English — no exceptions, regardless of the
+language used in the conversation.

@@ -1,4 +1,4 @@
-"""Risultato di validazione."""
+"""Validation result."""
 
 from dataclasses import dataclass
 from typing import Any
@@ -8,13 +8,13 @@ from ..enums import ValidationSeverity
 
 @dataclass(frozen=True)
 class StepValidationResult:
-    """Risultato di una singola validazione.
+    """Result of a single validation.
 
     Attributes:
-        severity: Livello di gravità del risultato
-        message: Descrizione del problema o avviso
-        step_name: Nome dello step che ha generato il risultato
-        context_key: Chiave del context coinvolta (opzionale)
+        severity: Severity level of the result
+        message: Description of the problem or warning
+        step_name: Name of the step that generated the result
+        context_key: Context key involved (optional)
     """
 
     severity: ValidationSeverity
@@ -23,26 +23,26 @@ class StepValidationResult:
     context_key: str | None = None
 
     def is_error(self) -> bool:
-        """Verifica se il risultato è un errore bloccante.
+        """Checks whether the result is a blocking error.
 
         Returns:
-            True se è un errore, False altrimenti
+            True if it is an error, False otherwise
         """
         return self.severity is ValidationSeverity.ERROR
 
     def is_warning(self) -> bool:
-        """Verifica se il risultato è un warning.
+        """Checks whether the result is a warning.
 
         Returns:
-            True se è un warning, False altrimenti
+            True if it is a warning, False otherwise
         """
         return self.severity is ValidationSeverity.WARNING
 
     def to_dict(self) -> dict[str, Any]:
-        """Serializza il risultato in dizionario.
+        """Serializes the result into a dictionary.
 
         Returns:
-            Dizionario con i dati del risultato
+            Dictionary with the result data
         """
         return {
             "severity": self.severity.value,

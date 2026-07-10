@@ -1,5 +1,5 @@
-"""Step generico che applica una catena di transform (iterabile→iterabile) a un valore
-del contesto.
+"""Generic step that applies a chain of transforms (iterable→iterable) to a value in the
+context.
 """
 
 from collections.abc import Callable, Iterable
@@ -15,15 +15,15 @@ from flowstep.core import (
 
 
 class ApplyStep(Step):
-    """Applica in catena uno o più transform (iterabile→iterabile) a un valore del contesto.
+    """Applies one or more transforms (iterable→iterable) to a context value, in sequence.
 
     Args:
-        name: Nome univoco dello step nel flow.
-        transforms: Uno o più callable `Iterable → Iterable` applicati in sequenza.
-        input_key: Chiave da cui leggere il valore sorgente nel `FlowContext`.
-        output_key: Chiave in cui scrivere il risultato nel `FlowContext`.
-        data_volume_observer: Observer notificato con gli elementi consumati/prodotti
-            al termine dell'esecuzione. Default `LoggingDataVolumeObserver()`.
+        name: Unique name of the step within the flow.
+        transforms: One or more `Iterable → Iterable` callables applied in sequence.
+        input_key: Key to read the source value from in the `FlowContext`.
+        output_key: Key to write the result to in the `FlowContext`.
+        data_volume_observer: Observer notified with the elements consumed/produced
+            at the end of execution. Defaults to `LoggingDataVolumeObserver()`.
 
     Example::
 
@@ -43,14 +43,14 @@ class ApplyStep(Step):
         output_key: str,
         data_volume_observer: DataVolumeObserver | None = None,
     ) -> None:
-        """Inietta nome, catena di transform, input key, output key e data volume observer.
+        """Injects name, transform chain, input key, output key, and data volume observer.
 
         Args:
-            name: Nome univoco dello step.
-            *transforms: Callable applicati in sequenza (zero o più).
-            input_key: Chiave sorgente nel contesto.
-            output_key: Chiave destinazione nel contesto.
-            data_volume_observer: Observer per il conteggio elementi. Default
+            name: Unique name of the step.
+            *transforms: Callables applied in sequence (zero or more).
+            input_key: Source key in the context.
+            output_key: Destination key in the context.
+            data_volume_observer: Observer for element counting. Defaults to
                 `LoggingDataVolumeObserver()`.
         """
         super().__init__(name)
@@ -62,8 +62,8 @@ class ApplyStep(Step):
         )
 
     def execute(self, context: FlowContext) -> None:
-        """Legge `input_key`, applica la catena di transform, scrive in `output_key`
-        e notifica il data volume observer con gli elementi consumati/prodotti.
+        """Reads `input_key`, applies the transform chain, writes to `output_key`,
+        and notifies the data volume observer with the elements consumed/produced.
 
         Args:
             context: Shared pipeline context.
@@ -77,9 +77,9 @@ class ApplyStep(Step):
             context.put(self._output_key, result)
 
     def get_required_keys(self) -> set[str]:
-        """Richiede `input_key` nel contesto."""
+        """Requires `input_key` in the context."""
         return {self._input_key}
 
     def get_produced_keys(self) -> set[str]:
-        """Produce `output_key` nel contesto."""
+        """Produces `output_key` in the context."""
         return {self._output_key}
