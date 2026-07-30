@@ -17,12 +17,12 @@ from .core import (
     Flow,
     FlowContext,
     FlowObserver,
+    FlowProgress,
     LoggingDataVolumeObserver,
     LoggingFlowObserver,
     LoggingStepObserver,
     Step,
     StepObserver,
-    StepProgress,
     track_data_volume,
 )
 from .core.exceptions import FlowExecutionError
@@ -46,7 +46,7 @@ __all__ = [
     "LoggingStepObserver",
     "DataVolumeObserver",
     "LoggingDataVolumeObserver",
-    "StepProgress",
+    "FlowProgress",
     "track_data_volume",
     "ValidationSeverity",
     "StepValidationResult",

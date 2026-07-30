@@ -1,11 +1,10 @@
 """Observability subpackage: pluggable step and flow lifecycle monitoring."""
 
-from .logging_data_volume_observer import LoggingDataVolumeObserver
-from .logging_flow_observer import LoggingFlowObserver
-from .logging_step_observer import LoggingStepObserver
-from .models import StepProgress
+from .data_volume_observers import LoggingDataVolumeObserver, track_data_volume
+from .flow_observers import LoggingFlowObserver
+from .models import FlowProgress
 from .protocols import DataVolumeObserver, FlowObserver, StepObserver
-from .track_data_volume import track_data_volume
+from .step_observers import LoggingStepObserver
 
 __all__ = [
     "FlowObserver",
@@ -14,6 +13,6 @@ __all__ = [
     "LoggingStepObserver",
     "DataVolumeObserver",
     "LoggingDataVolumeObserver",
-    "StepProgress",
+    "FlowProgress",
     "track_data_volume",
 ]

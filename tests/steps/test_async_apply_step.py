@@ -11,7 +11,9 @@ from conftest import RecordingDataVolumeObserver
 from flowstep.core import FlowContext
 from flowstep.steps import AsyncApplyStep
 
-_DATA_VOLUME_LOGGER_NAME = "flowstep.core.observability.logging_data_volume_observer"
+_DATA_VOLUME_LOGGER_NAME = (
+    "flowstep.core.observability.data_volume_observers.logging_data_volume_observer"
+)
 
 
 async def _double(values: Iterable[Any]) -> list[Any]:

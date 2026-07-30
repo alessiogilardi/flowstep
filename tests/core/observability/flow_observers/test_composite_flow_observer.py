@@ -2,12 +2,12 @@
 
 from conftest import MakeStep, RecordingFlowObserver
 
-from flowstep.core import StepProgress
-from flowstep.core.observability.composite_flow_observer import (
+from flowstep.core import FlowProgress
+from flowstep.core.observability.flow_observers.composite_flow_observer import (
     _CompositeFlowObserver,  # pyright: ignore[reportPrivateUsage]
 )
 
-_PROGRESS = StepProgress(index=1, total=1)
+_PROGRESS = FlowProgress(index=1, total=1)
 
 
 def test_on_start_fans_out_to_all_observers(make_step: MakeStep) -> None:
@@ -54,13 +54,13 @@ def test_fans_out_in_list_order(make_step: MakeStep) -> None:
         def __init__(self, label: str) -> None:
             self._label = label
 
-        def on_start(self, step: object, progress: StepProgress) -> None:
+        def on_start(self, step: object, progress: FlowProgress) -> None:
             call_order.append(self._label)
 
-        def on_end(self, step: object, duration_ms: float, progress: StepProgress) -> None:
+        def on_end(self, step: object, duration_ms: float, progress: FlowProgress) -> None:
             pass
 
-        def on_error(self, step: object, error: Exception, progress: StepProgress) -> None:
+        def on_error(self, step: object, error: Exception, progress: FlowProgress) -> None:
             pass
 
     first = OrderTrackingObserver("first")

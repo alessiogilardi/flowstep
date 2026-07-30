@@ -6,10 +6,10 @@ import pytest
 from conftest import MakeStep, RecordingFlowObserver
 
 from flowstep.builder import FlowBuilder
-from flowstep.core import Flow, LoggingFlowObserver, Step, StepProgress
+from flowstep.core import Flow, FlowProgress, LoggingFlowObserver, Step
 from flowstep.validation.exceptions import FlowValidationError
 
-_LOGGER_NAME = "flowstep.core.observability.logging_flow_observer"
+_LOGGER_NAME = "flowstep.core.observability.flow_observers.logging_flow_observer"
 
 
 def test_build_returns_flow_with_added_steps(make_step: MakeStep) -> None:
@@ -113,20 +113,20 @@ def test_build_flow_calls_default_logging_observer_before_custom_observer_on_sta
     call_order: list[str] = []
     original_on_start = LoggingFlowObserver.on_start
 
-    def recording_on_start(self: LoggingFlowObserver, step: Step, progress: StepProgress) -> None:
+    def recording_on_start(self: LoggingFlowObserver, step: Step, progress: FlowProgress) -> None:
         call_order.append("logging")
         original_on_start(self, step, progress)
 
     monkeypatch.setattr(LoggingFlowObserver, "on_start", recording_on_start)
 
     class OrderTrackingObserver:
-        def on_start(self, step: object, progress: StepProgress) -> None:
+        def on_start(self, step: object, progress: FlowProgress) -> None:
             call_order.append("custom")
 
-        def on_end(self, step: object, duration_ms: float, progress: StepProgress) -> None:
+        def on_end(self, step: object, duration_ms: float, progress: FlowProgress) -> None:
             pass
 
-        def on_error(self, step: object, error: Exception, progress: StepProgress) -> None:
+        def on_error(self, step: object, error: Exception, progress: FlowProgress) -> None:
             pass
 
     step = make_step(name="step")

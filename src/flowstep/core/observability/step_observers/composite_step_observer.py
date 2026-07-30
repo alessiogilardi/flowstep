@@ -2,8 +2,8 @@
 
 from typing import Self
 
-from ..step import Step
-from .protocols import StepObserver
+from ...step import Step
+from ..protocols import StepObserver
 
 
 class _CompositeStepObserver:  # pyright: ignore[reportUnusedClass]

@@ -7,7 +7,7 @@ from conftest import MakeStep
 
 from flowstep.core.observability import LoggingDataVolumeObserver
 
-_LOGGER_NAME = "flowstep.core.observability.logging_data_volume_observer"
+_LOGGER_NAME = "flowstep.core.observability.data_volume_observers.logging_data_volume_observer"
 
 
 def test_on_processed_logs_info_with_step_name_and_sizes(

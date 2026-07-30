@@ -1,5 +1,5 @@
 """Models subpackage: observability value objects."""
 
-from .step_progress import StepProgress
+from .flow_progress import FlowProgress
 
-__all__ = ["StepProgress"]
+__all__ = ["FlowProgress"]

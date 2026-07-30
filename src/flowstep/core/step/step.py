@@ -22,7 +22,7 @@ class Step(ABC):
 
     A step can be instrumented on its own, independent of any `Flow`, by attaching
     `StepObserver`s via `add_observer`. These notifications carry no pipeline-wide
-    `StepProgress` — unlike `Flow`'s own `FlowObserver` — since a step may run outside a
+    `FlowProgress` — unlike `Flow`'s own `FlowObserver` — since a step may run outside a
     pipeline entirely.
 
     Attributes:
@@ -38,7 +38,7 @@ class Step(ABC):
         # Deferred import: `core.observability` imports `Step` for its own type hints, so
         # importing it back at module level here would be a real circular import. This is
         # only ever resolved at instantiation time, well after both modules have loaded.
-        from ..observability.composite_step_observer import (
+        from ..observability.step_observers.composite_step_observer import (
             _CompositeStepObserver,  # pyright: ignore[reportPrivateUsage]
         )
 

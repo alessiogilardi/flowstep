@@ -5,7 +5,7 @@ from typing import Any
 
 from ..context import FlowContext
 from ..exceptions import FlowExecutionError
-from ..observability import FlowObserver, LoggingFlowObserver, StepProgress
+from ..observability import FlowObserver, FlowProgress, LoggingFlowObserver
 from ..step import Step
 
 
@@ -67,7 +67,7 @@ class Flow:
         self._context = initial_context
         total_steps = len(self._steps)
         for index, step in enumerate(self._steps, start=1):
-            self.__execute_step(step, StepProgress(index=index, total=total_steps))
+            self.__execute_step(step, FlowProgress(index=index, total=total_steps))
         return self._context
 
     def get_steps(self) -> list[Step]:
@@ -81,7 +81,7 @@ class Flow:
     def __repr__(self) -> str:
         return f"Flow(name='{self.name}', steps={len(self._steps)})"
 
-    def __execute_step(self, step: Step, progress: StepProgress) -> None:
+    def __execute_step(self, step: Step, progress: FlowProgress) -> None:
         self._observer.on_start(step, progress)
         start = perf_counter()
         try:

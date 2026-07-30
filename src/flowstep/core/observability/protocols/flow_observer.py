@@ -3,7 +3,7 @@
 from typing import Protocol, runtime_checkable
 
 from ...step import Step
-from ..models import StepProgress
+from ..models import FlowProgress
 
 
 @runtime_checkable
@@ -12,11 +12,11 @@ class FlowObserver(Protocol):
 
     Implementations are pluggable monitoring backends (logging, metrics, tracing, ...)
     injected into `Flow` so orchestration stays decoupled from any specific backend.
-    Unlike `StepObserver`, these hooks carry `StepProgress` — pipeline-wide position
+    Unlike `StepObserver`, these hooks carry `FlowProgress` — pipeline-wide position
     information only `Flow` can know, since a step may run outside any pipeline.
     """
 
-    def on_start(self, step: Step, progress: StepProgress) -> None:
+    def on_start(self, step: Step, progress: FlowProgress) -> None:
         """Called immediately before `step.execute()` runs.
 
         Args:
@@ -25,7 +25,7 @@ class FlowObserver(Protocol):
         """
         ...
 
-    def on_end(self, step: Step, duration_ms: float, progress: StepProgress) -> None:
+    def on_end(self, step: Step, duration_ms: float, progress: FlowProgress) -> None:
         """Called after `step.execute()` completes successfully.
 
         Args:
@@ -35,7 +35,7 @@ class FlowObserver(Protocol):
         """
         ...
 
-    def on_error(self, step: Step, error: Exception, progress: StepProgress) -> None:
+    def on_error(self, step: Step, error: Exception, progress: FlowProgress) -> None:
         """Called when `step.execute()` raises an exception.
 
         Args:

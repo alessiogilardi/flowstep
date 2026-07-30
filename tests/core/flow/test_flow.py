@@ -5,7 +5,7 @@ import logging
 import pytest
 from conftest import MakeStep, RecordingFlowObserver
 
-from flowstep.core import Flow, FlowContext, StepProgress
+from flowstep.core import Flow, FlowContext, FlowProgress
 from flowstep.core.exceptions import FlowExecutionError
 
 
@@ -16,7 +16,7 @@ def test_run_passes_index_and_total_to_observer_for_single_step(make_step: MakeS
     flow = Flow("pipeline", [step], observer=observer)
     flow.run()
 
-    expected_progress = StepProgress(index=1, total=1)
+    expected_progress = FlowProgress(index=1, total=1)
     assert observer.calls[0][3] == expected_progress
     assert observer.calls[1][3] == expected_progress
 
@@ -31,10 +31,10 @@ def test_run_passes_increasing_index_across_multiple_steps(make_step: MakeStep) 
 
     progress_by_call = [call[3] for call in observer.calls]
     assert progress_by_call == [
-        StepProgress(index=1, total=2),
-        StepProgress(index=1, total=2),
-        StepProgress(index=2, total=2),
-        StepProgress(index=2, total=2),
+        FlowProgress(index=1, total=2),
+        FlowProgress(index=1, total=2),
+        FlowProgress(index=2, total=2),
+        FlowProgress(index=2, total=2),
     ]
 
 
@@ -145,7 +145,9 @@ def test_run_uses_default_logging_observer_when_none_provided(
     step = make_step(name="step")
     flow = Flow("pipeline", [step])
 
-    with caplog.at_level(logging.INFO, logger="flowstep.core.observability.logging_flow_observer"):
+    with caplog.at_level(
+        logging.INFO, logger="flowstep.core.observability.flow_observers.logging_flow_observer"
+    ):
         flow.run()
 
     assert any("step" in record.getMessage() for record in caplog.records)

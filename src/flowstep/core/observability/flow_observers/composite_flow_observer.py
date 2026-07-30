@@ -1,8 +1,8 @@
 """Private composite observer that fans out lifecycle events to multiple observers."""
 
-from ..step import Step
-from .models import StepProgress
-from .protocols import FlowObserver
+from ...step import Step
+from ..models import FlowProgress
+from ..protocols import FlowObserver
 
 
 class _CompositeFlowObserver:  # pyright: ignore[reportUnusedClass]
@@ -25,7 +25,7 @@ class _CompositeFlowObserver:  # pyright: ignore[reportUnusedClass]
         """
         self._observers = list(observers)
 
-    def on_start(self, step: Step, progress: StepProgress) -> None:
+    def on_start(self, step: Step, progress: FlowProgress) -> None:
         """Notify every observer that `step` is about to start.
 
         Args:
@@ -35,7 +35,7 @@ class _CompositeFlowObserver:  # pyright: ignore[reportUnusedClass]
         for observer in self._observers:
             observer.on_start(step, progress)
 
-    def on_end(self, step: Step, duration_ms: float, progress: StepProgress) -> None:
+    def on_end(self, step: Step, duration_ms: float, progress: FlowProgress) -> None:
         """Notify every observer that `step` completed successfully.
 
         Args:
@@ -46,7 +46,7 @@ class _CompositeFlowObserver:  # pyright: ignore[reportUnusedClass]
         for observer in self._observers:
             observer.on_end(step, duration_ms, progress)
 
-    def on_error(self, step: Step, error: Exception, progress: StepProgress) -> None:
+    def on_error(self, step: Step, error: Exception, progress: FlowProgress) -> None:
         """Notify every observer that `step` failed.
 
         Args:

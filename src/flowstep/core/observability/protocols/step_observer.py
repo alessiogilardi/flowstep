@@ -11,7 +11,7 @@ class StepObserver(Protocol):
 
     Implementations are pluggable monitoring backends attached directly to a `Step` via
     `Step.add_observer`, so a step stays instrumentable even when run outside a `Flow`.
-    Unlike `FlowObserver`, these hooks carry no `StepProgress` — a step may not belong to
+    Unlike `FlowObserver`, these hooks carry no `FlowProgress` — a step may not belong to
     any pipeline at all.
     """
 

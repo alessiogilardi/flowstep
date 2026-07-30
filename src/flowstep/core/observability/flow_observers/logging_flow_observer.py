@@ -2,8 +2,8 @@
 
 import logging
 
-from ..step import Step
-from .models import StepProgress
+from ...step import Step
+from ..models import FlowProgress
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ class LoggingFlowObserver:
     Structurally satisfies the `FlowObserver` Protocol without inheriting from it.
     """
 
-    def on_start(self, step: Step, progress: StepProgress) -> None:
+    def on_start(self, step: Step, progress: FlowProgress) -> None:
         """Log a DEBUG message when a step starts.
 
         Args:
@@ -23,7 +23,7 @@ class LoggingFlowObserver:
         """
         logger.debug("Step '%s' started (%d/%d)", step.name, progress.index, progress.total)
 
-    def on_end(self, step: Step, duration_ms: float, progress: StepProgress) -> None:
+    def on_end(self, step: Step, duration_ms: float, progress: FlowProgress) -> None:
         """Log an INFO message when a step completes successfully.
 
         Args:
@@ -39,7 +39,7 @@ class LoggingFlowObserver:
             progress.total,
         )
 
-    def on_error(self, step: Step, error: Exception, progress: StepProgress) -> None:
+    def on_error(self, step: Step, error: Exception, progress: FlowProgress) -> None:
         """Log an ERROR message when a step fails.
 
         Args:

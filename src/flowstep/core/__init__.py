@@ -5,11 +5,11 @@ from .flow import Flow
 from .observability import (
     DataVolumeObserver,
     FlowObserver,
+    FlowProgress,
     LoggingDataVolumeObserver,
     LoggingFlowObserver,
     LoggingStepObserver,
     StepObserver,
-    StepProgress,
     track_data_volume,
 )
 from .step import Step
@@ -24,6 +24,6 @@ __all__ = [
     "LoggingStepObserver",
     "DataVolumeObserver",
     "LoggingDataVolumeObserver",
-    "StepProgress",
+    "FlowProgress",
     "track_data_volume",
 ]

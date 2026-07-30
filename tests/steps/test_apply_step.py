@@ -10,7 +10,9 @@ from conftest import RecordingDataVolumeObserver
 from flowstep.core import FlowContext, Step
 from flowstep.steps import ApplyStep
 
-_DATA_VOLUME_LOGGER_NAME = "flowstep.core.observability.logging_data_volume_observer"
+_DATA_VOLUME_LOGGER_NAME = (
+    "flowstep.core.observability.data_volume_observers.logging_data_volume_observer"
+)
 
 
 def test_execute_applies_single_transform_and_writes_output_key() -> None:

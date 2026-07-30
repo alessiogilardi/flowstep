@@ -5,7 +5,7 @@ from typing import Any, Protocol
 
 import pytest
 
-from flowstep.core import FlowContext, Step, StepProgress
+from flowstep.core import FlowContext, FlowProgress, Step
 
 
 class RecordingStep(Step):
@@ -73,15 +73,15 @@ class RecordingFlowObserver:
     """
 
     def __init__(self) -> None:
-        self.calls: list[tuple[str, str, Any, StepProgress]] = []
+        self.calls: list[tuple[str, str, Any, FlowProgress]] = []
 
-    def on_start(self, step: Step, progress: StepProgress) -> None:
+    def on_start(self, step: Step, progress: FlowProgress) -> None:
         self.calls.append(("on_start", step.name, None, progress))
 
-    def on_end(self, step: Step, duration_ms: float, progress: StepProgress) -> None:
+    def on_end(self, step: Step, duration_ms: float, progress: FlowProgress) -> None:
         self.calls.append(("on_end", step.name, duration_ms, progress))
 
-    def on_error(self, step: Step, error: Exception, progress: StepProgress) -> None:
+    def on_error(self, step: Step, error: Exception, progress: FlowProgress) -> None:
         self.calls.append(("on_error", step.name, error, progress))
 
 
@@ -92,7 +92,7 @@ class RecordingStepObserver:
     the `duration_ms` for `on_end`, and the raised exception for `on_error`. Structurally
     satisfies the `StepObserver` protocol contract without importing it, so this double
     works independently of the observability subpackage. Unlike `RecordingFlowObserver`,
-    it carries no `StepProgress`.
+    it carries no `FlowProgress`.
     """
 
     def __init__(self) -> None:

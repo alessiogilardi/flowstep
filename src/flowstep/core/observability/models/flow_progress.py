@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)
-class StepProgress:
+class FlowProgress:
     """Position of a step within the sequential execution of a `Flow`.
 
     Attributes:

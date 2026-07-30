@@ -7,7 +7,7 @@ from typing import Any, Self
 from pydantic import BaseModel
 
 from ..core import Flow, FlowContext, FlowObserver, LoggingFlowObserver, Step
-from ..core.observability.composite_flow_observer import (
+from ..core.observability.flow_observers.composite_flow_observer import (
     _CompositeFlowObserver,  # pyright: ignore[reportPrivateUsage]
 )
 from ..validation import FlowValidator
