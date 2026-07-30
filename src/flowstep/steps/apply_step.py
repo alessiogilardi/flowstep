@@ -30,8 +30,8 @@ class ApplyStep(Step):
         step = ApplyStep(
             "clean",
             ForEach(ArticleCleaner()),
-            input_key=context_keys.PARSED_ARTICLES,
-            output_key=context_keys.CLEANED_ARTICLES,
+            input_key="input_key",
+            output_key="output_key",
         )
     """
 
@@ -72,9 +72,14 @@ class ApplyStep(Step):
             self._data_volume_observer, self, context, self._input_key, self._output_key
         ):
             result: Any = context.get(self._input_key)
-            for transform in self._transforms:
-                result = transform(result)
+            result = self.apply(result)
             context.put(self._output_key, result)
+
+    def apply(self, result: Any) -> Any:
+        """Applies the transform chain to the result."""
+        for transform in self._transforms:
+            result = transform(result)
+        return result
 
     def get_required_keys(self) -> set[str]:
         """Requires `input_key` in the context."""
