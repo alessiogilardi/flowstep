@@ -5,7 +5,7 @@ from typing import Any
 
 from ..context import FlowContext
 from ..exceptions import FlowExecutionError
-from ..observability import LoggingObserver, StepObserver, StepProgress
+from ..observability import FlowObserver, LoggingFlowObserver, StepProgress
 from ..step import Step
 
 
@@ -24,18 +24,18 @@ class Flow:
         self,
         name: str,
         steps: list[Step],
-        observer: StepObserver | None = None,
+        observer: FlowObserver | None = None,
     ) -> None:
         """Initialize the pipeline.
 
         Args:
             name: Name of the pipeline.
             steps: List of steps to execute sequentially.
-            observer: Step lifecycle observer. Defaults to `LoggingObserver()`.
+            observer: Step lifecycle observer. Defaults to `LoggingFlowObserver()`.
         """
         self.name = name
         self._steps = list(steps)
-        self._observer: StepObserver = observer or LoggingObserver()
+        self._observer: FlowObserver = observer or LoggingFlowObserver()
 
     @property
     def _context(self) -> FlowContext:

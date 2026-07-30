@@ -4,8 +4,10 @@ from .context import FlowContext
 from .flow import Flow
 from .observability import (
     DataVolumeObserver,
+    FlowObserver,
     LoggingDataVolumeObserver,
-    LoggingObserver,
+    LoggingFlowObserver,
+    LoggingStepObserver,
     StepObserver,
     StepProgress,
     track_data_volume,
@@ -16,8 +18,10 @@ __all__ = [
     "Step",
     "Flow",
     "FlowContext",
+    "FlowObserver",
+    "LoggingFlowObserver",
     "StepObserver",
-    "LoggingObserver",
+    "LoggingStepObserver",
     "DataVolumeObserver",
     "LoggingDataVolumeObserver",
     "StepProgress",

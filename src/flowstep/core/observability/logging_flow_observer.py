@@ -1,4 +1,4 @@
-"""Default StepObserver implementation backed by stdlib logging."""
+"""Default FlowObserver implementation backed by stdlib logging."""
 
 import logging
 
@@ -8,10 +8,10 @@ from .models import StepProgress
 logger = logging.getLogger(__name__)
 
 
-class LoggingObserver:
-    """Default `StepObserver` that logs step lifecycle events via stdlib `logging`.
+class LoggingFlowObserver:
+    """Default `FlowObserver` that logs step lifecycle events via stdlib `logging`.
 
-    Structurally satisfies the `StepObserver` Protocol without inheriting from it.
+    Structurally satisfies the `FlowObserver` Protocol without inheriting from it.
     """
 
     def on_start(self, step: Step, progress: StepProgress) -> None:

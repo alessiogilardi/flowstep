@@ -2,22 +2,22 @@
 
 from ..step import Step
 from .models import StepProgress
-from .protocols import StepObserver
+from .protocols import FlowObserver
 
 
-class _CompositeObserver:  # pyright: ignore[reportUnusedClass]
+class _CompositeFlowObserver:  # pyright: ignore[reportUnusedClass]
     """Fans out step lifecycle events to a list of observers, in order.
 
-    Structurally satisfies the `StepObserver` Protocol. Composition of multiple
+    Structurally satisfies the `FlowObserver` Protocol. Composition of multiple
     observers is an observability concern, so `Flow` only ever calls a single
-    `StepObserver` and stays unaware of how many observers are behind it.
+    `FlowObserver` and stays unaware of how many observers are behind it.
 
     Observer calls are intentionally not guarded against exceptions: a broken
     observer is a programming error and should surface rather than be swallowed,
     matching the stance already documented on `Flow`.
     """
 
-    def __init__(self, observers: list[StepObserver]) -> None:
+    def __init__(self, observers: list[FlowObserver]) -> None:
         """Initialize the composite observer.
 
         Args:

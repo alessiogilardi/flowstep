@@ -3,14 +3,14 @@
 import logging
 
 import pytest
-from conftest import MakeStep, RecordingObserver
+from conftest import MakeStep, RecordingFlowObserver
 
 from flowstep.core import Flow, FlowContext, StepProgress
 from flowstep.core.exceptions import FlowExecutionError
 
 
 def test_run_passes_index_and_total_to_observer_for_single_step(make_step: MakeStep) -> None:
-    observer = RecordingObserver()
+    observer = RecordingFlowObserver()
     step = make_step(name="step")
 
     flow = Flow("pipeline", [step], observer=observer)
@@ -22,7 +22,7 @@ def test_run_passes_index_and_total_to_observer_for_single_step(make_step: MakeS
 
 
 def test_run_passes_increasing_index_across_multiple_steps(make_step: MakeStep) -> None:
-    observer = RecordingObserver()
+    observer = RecordingFlowObserver()
     step_a = make_step(name="a")
     step_b = make_step(name="b")
 
@@ -99,7 +99,7 @@ def test_get_steps_returns_copy_not_internal_list(make_step: MakeStep) -> None:
 
 
 def test_run_calls_observer_on_start_then_on_end_on_success(make_step: MakeStep) -> None:
-    observer = RecordingObserver()
+    observer = RecordingFlowObserver()
     step = make_step(name="step")
 
     flow = Flow("pipeline", [step], observer=observer)
@@ -115,7 +115,7 @@ def test_run_calls_observer_on_start_then_on_error_on_failure(make_step: MakeSte
     def failing_execute(_: FlowContext) -> None:
         raise ValueError("boom")
 
-    observer = RecordingObserver()
+    observer = RecordingFlowObserver()
     step = make_step(name="risky", on_execute=failing_execute)
     flow = Flow("pipeline", [step], observer=observer)
 
@@ -128,7 +128,7 @@ def test_run_calls_observer_on_start_then_on_error_on_failure(make_step: MakeSte
 
 
 def test_run_calls_observer_hooks_in_step_order_for_multiple_steps(make_step: MakeStep) -> None:
-    observer = RecordingObserver()
+    observer = RecordingFlowObserver()
     step_a = make_step(name="a")
     step_b = make_step(name="b")
 
@@ -145,7 +145,7 @@ def test_run_uses_default_logging_observer_when_none_provided(
     step = make_step(name="step")
     flow = Flow("pipeline", [step])
 
-    with caplog.at_level(logging.INFO, logger="flowstep.core.observability.logging_observer"):
+    with caplog.at_level(logging.INFO, logger="flowstep.core.observability.logging_flow_observer"):
         flow.run()
 
     assert any("step" in record.getMessage() for record in caplog.records)

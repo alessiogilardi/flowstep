@@ -5,6 +5,12 @@ All notable changes to this project are documented in this file. Format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-30
+
+### Added
+
+- Split FlowObserver from StepObserver; add Step.add_observer
+
 ## [0.3.0] - 2026-07-30
 
 ### Added

@@ -3,13 +3,13 @@
 import logging
 
 import pytest
-from conftest import MakeStep, RecordingObserver
+from conftest import MakeStep, RecordingFlowObserver
 
 from flowstep.builder import FlowBuilder
-from flowstep.core import Flow, LoggingObserver, Step, StepProgress
+from flowstep.core import Flow, LoggingFlowObserver, Step, StepProgress
 from flowstep.validation.exceptions import FlowValidationError
 
-_LOGGER_NAME = "flowstep.core.observability.logging_observer"
+_LOGGER_NAME = "flowstep.core.observability.logging_flow_observer"
 
 
 def test_build_returns_flow_with_added_steps(make_step: MakeStep) -> None:
@@ -64,13 +64,13 @@ def test_build_with_validate_uses_initial_context_keys(make_step: MakeStep) -> N
 def test_add_observer_returns_self_for_chaining() -> None:
     builder = FlowBuilder("pipeline")
 
-    result = builder.add_observer(RecordingObserver())
+    result = builder.add_observer(RecordingFlowObserver())
 
     assert result is builder
 
 
 def test_build_flow_notifies_registered_observer_on_run(make_step: MakeStep) -> None:
-    observer = RecordingObserver()
+    observer = RecordingFlowObserver()
     step = make_step(name="step")
 
     flow = FlowBuilder("pipeline").add_step(step).add_observer(observer).build()
@@ -95,7 +95,7 @@ def test_build_flow_uses_default_logging_observer_without_add_observer(
 def test_build_flow_notifies_both_default_logging_and_custom_observer(
     make_step: MakeStep, caplog: pytest.LogCaptureFixture
 ) -> None:
-    observer = RecordingObserver()
+    observer = RecordingFlowObserver()
     step = make_step(name="step")
 
     flow = FlowBuilder("pipeline").add_step(step).add_observer(observer).build()
@@ -111,13 +111,13 @@ def test_build_flow_calls_default_logging_observer_before_custom_observer_on_sta
     make_step: MakeStep, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     call_order: list[str] = []
-    original_on_start = LoggingObserver.on_start
+    original_on_start = LoggingFlowObserver.on_start
 
-    def recording_on_start(self: LoggingObserver, step: Step, progress: StepProgress) -> None:
+    def recording_on_start(self: LoggingFlowObserver, step: Step, progress: StepProgress) -> None:
         call_order.append("logging")
         original_on_start(self, step, progress)
 
-    monkeypatch.setattr(LoggingObserver, "on_start", recording_on_start)
+    monkeypatch.setattr(LoggingFlowObserver, "on_start", recording_on_start)
 
     class OrderTrackingObserver:
         def on_start(self, step: object, progress: StepProgress) -> None:
