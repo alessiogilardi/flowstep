@@ -1,6 +1,7 @@
 """Private composite observer that fans out lifecycle events to multiple observers."""
 
 from ..step import Step
+from .models import StepProgress
 from .protocols import StepObserver
 
 
@@ -24,31 +25,34 @@ class _CompositeObserver:  # pyright: ignore[reportUnusedClass]
         """
         self._observers = list(observers)
 
-    def on_start(self, step: Step) -> None:
+    def on_start(self, step: Step, progress: StepProgress) -> None:
         """Notify every observer that `step` is about to start.
 
         Args:
             step: The step about to be executed.
+            progress: The step's position within the pipeline.
         """
         for observer in self._observers:
-            observer.on_start(step)
+            observer.on_start(step, progress)
 
-    def on_end(self, step: Step, duration_ms: float) -> None:
+    def on_end(self, step: Step, duration_ms: float, progress: StepProgress) -> None:
         """Notify every observer that `step` completed successfully.
 
         Args:
             step: The step that was executed.
             duration_ms: Execution duration in milliseconds.
+            progress: The step's position within the pipeline.
         """
         for observer in self._observers:
-            observer.on_end(step, duration_ms)
+            observer.on_end(step, duration_ms, progress)
 
-    def on_error(self, step: Step, error: Exception) -> None:
+    def on_error(self, step: Step, error: Exception, progress: StepProgress) -> None:
         """Notify every observer that `step` failed.
 
         Args:
             step: The step that failed.
             error: The exception raised by the step.
+            progress: The step's position within the pipeline.
         """
         for observer in self._observers:
-            observer.on_error(step, error)
+            observer.on_error(step, error, progress)

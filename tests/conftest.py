@@ -5,7 +5,7 @@ from typing import Any, Protocol
 
 import pytest
 
-from flowstep.core import FlowContext, Step
+from flowstep.core import FlowContext, Step, StepProgress
 
 
 class RecordingStep(Step):
@@ -66,23 +66,23 @@ def make_step() -> MakeStep:
 class RecordingObserver:
     """Observer double that records on_start/on_end/on_error calls as a list of tuples.
 
-    Each entry is `(event, step_name, payload)` where `payload` is `None` for `on_start`,
-    the `duration_ms` for `on_end`, and the raised exception for `on_error`. Structurally
-    satisfies the `StepObserver` protocol contract without importing it, so this double
-    works independently of the observability subpackage.
+    Each entry is `(event, step_name, payload, progress)` where `payload` is `None` for
+    `on_start`, the `duration_ms` for `on_end`, and the raised exception for `on_error`.
+    Structurally satisfies the `StepObserver` protocol contract without importing it, so
+    this double works independently of the observability subpackage.
     """
 
     def __init__(self) -> None:
-        self.calls: list[tuple[str, str, Any]] = []
+        self.calls: list[tuple[str, str, Any, StepProgress]] = []
 
-    def on_start(self, step: Step) -> None:
-        self.calls.append(("on_start", step.name, None))
+    def on_start(self, step: Step, progress: StepProgress) -> None:
+        self.calls.append(("on_start", step.name, None, progress))
 
-    def on_end(self, step: Step, duration_ms: float) -> None:
-        self.calls.append(("on_end", step.name, duration_ms))
+    def on_end(self, step: Step, duration_ms: float, progress: StepProgress) -> None:
+        self.calls.append(("on_end", step.name, duration_ms, progress))
 
-    def on_error(self, step: Step, error: Exception) -> None:
-        self.calls.append(("on_error", step.name, error))
+    def on_error(self, step: Step, error: Exception, progress: StepProgress) -> None:
+        self.calls.append(("on_error", step.name, error, progress))
 
 
 class RecordingDataVolumeObserver:

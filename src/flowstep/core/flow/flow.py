@@ -5,7 +5,7 @@ from typing import Any
 
 from ..context import FlowContext
 from ..exceptions import FlowExecutionError
-from ..observability import LoggingObserver, StepObserver
+from ..observability import LoggingObserver, StepObserver, StepProgress
 from ..step import Step
 
 
@@ -65,8 +65,9 @@ class Flow:
             FlowExecutionError: If a step raises during execution.
         """
         self._context = initial_context
-        for step in self._steps:
-            self.__execute_step(step)
+        total_steps = len(self._steps)
+        for index, step in enumerate(self._steps, start=1):
+            self.__execute_step(step, StepProgress(index=index, total=total_steps))
         return self._context
 
     def get_steps(self) -> list[Step]:
@@ -80,13 +81,13 @@ class Flow:
     def __repr__(self) -> str:
         return f"Flow(name='{self.name}', steps={len(self._steps)})"
 
-    def __execute_step(self, step: Step) -> None:
-        self._observer.on_start(step)
+    def __execute_step(self, step: Step, progress: StepProgress) -> None:
+        self._observer.on_start(step, progress)
         start = perf_counter()
         try:
             step(self._context)
         except Exception as e:
-            self._observer.on_error(step, e)
+            self._observer.on_error(step, e, progress)
             raise FlowExecutionError(step.name, e) from e
         else:
-            self._observer.on_end(step, (perf_counter() - start) * 1000)
+            self._observer.on_end(step, (perf_counter() - start) * 1000, progress)

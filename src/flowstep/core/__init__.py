@@ -7,6 +7,7 @@ from .observability import (
     LoggingDataVolumeObserver,
     LoggingObserver,
     StepObserver,
+    StepProgress,
     track_data_volume,
 )
 from .step import Step
@@ -19,5 +20,6 @@ __all__ = [
     "LoggingObserver",
     "DataVolumeObserver",
     "LoggingDataVolumeObserver",
+    "StepProgress",
     "track_data_volume",
 ]
